@@ -57,7 +57,11 @@ puts 2 * 1
 
 # Will refactor later using a recursive method
 
+# Exercise 6
 
+puts 4.32 * 4.32
+puts 7.11 * 7.11
+puts 9.03 * 9.03
 
 
 
