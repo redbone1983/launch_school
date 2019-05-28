@@ -1,41 +1,20 @@
-# Ex. 1: with double quotes
-"The man said, 'Hi there!'"
+# Strings
 
-# Ex 2: with single quotes and escaping
-'The man said, \'Hi there!\''
+# Exercise 1
+first_name = "Maya "
+last_name = "Roman"
 
-=begin
+puts first_name + last_name
 
-Double quotes allow something called string interpolation. 
-To try it out, type the following into an irb session:
+# Exercise 2
 
-irb :001 > a = 'ten'
-=> "ten"
+puts 7312 / 1000
+puts 7312 % 1000 / 100
+puts 7312 % 100 / 10
+puts 7312 % 10
 
-irb :002 > "My favorite number is #{a}!"
-=> "My favorite number is #{a}!"
-
-=end
-
-# Examples of symbols
-
-#:name
-#:a_symbol
-#:"surprisingly, this is also a symbol"
+# Exercise 3
 
 
-# Example of integers
-# 1, 2, 3, 50, 10, 4345098098
 
-# Example of floats
-#1.2345, 2345.4267, 98.2234
 
-#nil
-
-=begin
-
-irb :001 > puts "Hello, World!"
-Hello, World!
-=> nil
-
-=end
