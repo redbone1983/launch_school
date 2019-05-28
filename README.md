@@ -2,12 +2,12 @@
 
 # INTRO TO PROGRAMMING
 
-# The Basics
-# Variables
-# Methods
-# Flow Control
-# Loops & Iterators
-# Arrays
-# Hashes
-# More Stuff
-# Exercises
+## The Basics
+## Variables
+## Methods
+## Flow Control
+## Loops & Iterators
+## Arrays
+## Hashes
+## More Stuff
+## Exercises
