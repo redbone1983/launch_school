@@ -16,11 +16,11 @@ puts 7312 % 10
 # Exercise 3
 
 movies = {
-	yentl: 1983,
-	gremlins: 1984,
-	et: 1982,
-	harry_and_the_hendersons: 1987,
-	moonwalker: 1988,
+  yentl: 1983,
+  gremlins: 1984,
+  et: 1982,
+  harry_and_the_hendersons: 1987,
+  moonwalker: 1988,
 }
 
 puts movies[:yentl]
@@ -32,11 +32,11 @@ puts movies[:moonwalker]
 # Exercise 4 
 
 movies_arr = [
-	1983,
-	1984,
-	1982,
-	1987,
-	1988
+  1983,
+  1984,
+  1982,
+  1987,
+  1988
 ]
 
 puts movies_arr[0]
