@@ -82,3 +82,7 @@ p "Please enter a number between 0 and 100. "
 number = gets.to_i
 
 p num_check(number)
+
+# Exercise 6
+
+# add another end to the end of the method
