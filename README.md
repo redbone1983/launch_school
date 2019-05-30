@@ -1,6 +1,6 @@
 # INTRO TO PROGRAMMING
 
-The purpose for this repo is to add exercises for Launch Schools Curriculum.
+The purpose for this repo is to add exercises from Launch Schools Curriculum.
 
 ## The Basics
 
