@@ -29,7 +29,7 @@
 
 # Exercise 5 
 def countdown(num)
-    puts num
+  puts num
   if num != 0
     countdown(num - 1) 
   end
