@@ -78,6 +78,21 @@ p person[:name]
 # What method could you use to find out if a Hash contains a specific value in it? Write a program to demonstrate this use.
 p person.fetch(:hobbies) # => "painting"
 
+# Ex. 6 - Anagrams
+# Write a program that prints out groups of words that are anagrams. Anagrams are words that have the same exact letters in them but in a different order. Your output should look something like this:
+words =  ['demo', 'none', 'tied', 'evil', 'dome', 'mode', 'live',
+  'fowl', 'veil', 'wolf', 'diet', 'vile', 'edit', 'tide',
+  'flow', 'neon']
 
+words_hash = words.each_with_object(Hash.new []) do |word, hash| hash[word.chars.sort] += [word]
+  end
 
+p words_hash.values
 
+# Ex. 7 
+# The difference is that the value of "hi there" can only be assigned as the key in my_hash using the rocket => syntax. 
+# {x: "some value"} ony works if key is the symbol :x
+x = "hi there" 
+my_hash = {x: "some value"}
+  
+# Ex. 8 - B. There is no method called keys for Array objects.
