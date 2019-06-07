@@ -7,11 +7,7 @@
 
 # Kernel.puts() method to display output. Remember that Kernel.gets() includes the newline, so you have to call chomp() to remove it: Kernel.gets().chomp().
 
-
 # First Attempt without Watching Video
-
-
-
 # asks for two numbers
 print "Please enter a number. "
 num_one = Kernel.gets().to_i()
