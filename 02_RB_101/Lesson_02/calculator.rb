@@ -24,12 +24,12 @@ result =
   when "add" then num_one + num_two
   when "subtract" then num_one - num_two
   when "multiply" then num_one * num_two
-  when "divide" then num_one / num_two
+  when "divide" then num_one.to_f / num_two.to_f
   else "The operator you entered is invalid."
   end
 
 # displays the result
-p "The result of #{operator}ing #{num_one} & #{num_two} is #{result}."
+p "The result is #{result}."
 
 # Notes on project refactor:
 
