@@ -31,21 +31,19 @@ loop do
   name = Kernel.gets().chomp()
   if valid_string?(name)
     prompt("Hello, #{name}.")
-    break
   else
     prompt("Hmm... that doesn't look like a valid name.")
   end
+  break
 end
 
 # Initialize Main Loop
 loop do
   number1 = ""
   loop do
-    if count > 0
-      prompt("Welcome back, #{name}.")
-    else
-      break
-    end
+    # Use Ternary Operator for optional greeting for return users
+    count == 1 ? prompt("Welcome back, #{name}. You have calculated #{count} time today.") : nil
+    count > 1 ? prompt("Welcome back, #{name}. You have calculated #{count} times today.") : nil
     # Prompt user for number 1
     prompt("What's the first number?")
     number1 = Kernel.gets().chomp()
@@ -115,4 +113,4 @@ loop do
   count += 1
 end
 
-prompt("Thank you for using the calculator! Goodbye!")
+prompt("Thank you for using the calculator! Goodbye #{name}!")
