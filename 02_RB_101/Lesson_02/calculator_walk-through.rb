@@ -1,50 +1,124 @@
-# ask the user for two numbers
-# ask the user for an operation to perform
-# perform the operation on the two numbers
-# output the result
-
-# gets - pauses the program, wait for the user to input something and then hit the enter key to end programs execution
-
-# Capture user input in a variable
-# answer = gets
-# # Prints output
-# puts answer
-
-# # gets and puts are located in a module called Kernel
-# Kernel.gets()
-# Kernel.puts()
-
-# Welcome users
-Kernel.puts("Welcome to Calculator!")
-
-# Prompt user for numbers
-Kernel.puts("What's the first number?")
-number1 = Kernel.gets().chomp()
-
-Kernel.puts("What's the second number?")
-number2 = Kernel.gets().chomp()
-
-Kernel.puts("what operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide")
-operator = Kernel.gets().chomp()
-
-# result is available outside of the if condition because it is not a block
-if operator == '1'
-  result = number1.to_i() + number2.to_i()
-elsif operator == '2'
-  result = number1.to_i() - number2.to_i()
-elsif operator == '3'
-  result = number1.to_i() * number2.to_i()
-elsif operator == '4'
-  # Convert string into float representation with .to_f()
-  result = number1.to_f() / number2.to_f()
+def prompt(message)
+  Kernel.puts("=> #{message}")
 end
 
-Kernel.puts("The result is #{result}")
+def valid_string?(str)
+  str.to_s != 0
+end
+
+def valid_number?(num)
+  num.to_i != 0
+end
+
+def operation_to_message(op)
+  case op
+  when "1"
+    "Adding"
+  when "2"
+    "Subtracting"
+  when "3"
+    "Multiplying"
+  when "4"
+    "Dividing"
+  end
+end
+
+# Welcome users
+count = 0
+name = ""
+loop do
+  prompt("Welcome to Calculator! Enter your name:")
+  name = Kernel.gets().chomp()
+  if valid_string?(name)
+    prompt("Hello, #{name}.")
+    break
+  else
+    prompt("Hmm... that doesn't look like a valid name.")
+  end
+end
+
+#Initialize Main Loop
+loop do
+  number1 = ""
+  loop do
+    # Prompt user for number 1
+      if count > 0 
+        prompt("Welcome back, #{name}.")
+        prompt("What's the first number?")
+      else
+        prompt("What's the first number?")
+      end
+    number1 = Kernel.gets().chomp()
+    # Invoke Number Validation Method
+    if valid_number?(number1)
+      break
+    else
+      prompt("Hmm... that doesn't look like a valid number")
+    end
+  end
+
+  number2 = ""
+  loop do
+    # Prompt user for number 2
+    prompt("What's the second number?")
+    number2 = Kernel.gets().chomp()
+    # Invoke Number Validation Method
+    if valid_number?(number2)
+      break
+    else
+      prompt("Hmm... that doesn't look like a valid number.")
+    end
+  end
+
+  operator_prompt = <<-MSG 
+    "What operation would you like to perform? 
+    1) add 
+    2) subtract 
+    3) multiply 
+    4) divide
+  MSG
+  
+  prompt(operator_prompt)
+  
+  operator = ""
+  loop do
+    operator = Kernel.gets().chomp()
+
+    if %w(1 2 3 4).include?(operator)
+      break
+    else
+      prompt("Must choose 1, 2, 3 or 4.")
+    end
+  end
+
+  prompt("#{operation_to_message(operator)} the two numbers...")
+
+  result =
+    case operator
+    when "1"
+      number1.to_i() + number2.to_i()
+    when "2"
+      number1.to_i() - number2.to_i()
+    when "3" 
+      number1.to_i() * number2.to_i()
+    when "4"
+      number1.to_f() / number2.to_f()
+    else "The operator you entered is invalid."
+    end
+
+    prompt("The result is #{result}")
+    
+    prompt("Do you want to perform another calculation? (Y to calculate again)")
+    answer = Kernel.gets().chomp()
+    break unless answer.downcase().start_with?("y")
+    # Initialize game count
+    count += 1
+end
+
+prompt("Thank you for using the calculator! Goodbye!")
 
 
-
-
-# Kernel.gets automatically returns a string with "\n" appended "string\n"
-# Add .chomp() to remove "\n" character - Kernel.gets().chomp()
-
-
+# refactor later - There are lots of messages sprinkled throughout the program. 
+# Could we move them into some configuration file and access by key? This would 
+# allow us to manage the messages much easier, and we could even internationalize 
+# the messages. This is just a thought experiment, and no need to code this up.
