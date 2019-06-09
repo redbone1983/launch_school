@@ -37,17 +37,17 @@ loop do
   end
 end
 
-#Initialize Main Loop
+# Initialize Main Loop
 loop do
   number1 = ""
   loop do
+    if count > 0
+      prompt("Welcome back, #{name}.")
+    else
+      break
+    end
     # Prompt user for number 1
-      if count > 0 
-        prompt("Welcome back, #{name}.")
-        prompt("What's the first number?")
-      else
-        prompt("What's the first number?")
-      end
+    prompt("What's the first number?")
     number1 = Kernel.gets().chomp()
     # Invoke Number Validation Method
     if valid_number?(number1)
@@ -70,16 +70,16 @@ loop do
     end
   end
 
-  operator_prompt = <<-MSG 
-    "What operation would you like to perform? 
-    1) add 
-    2) subtract 
-    3) multiply 
+  operator_prompt = <<-MSG
+    "What operation would you like to perform?
+    1) add
+    2) subtract
+    3) multiply
     4) divide
   MSG
-  
+
   prompt(operator_prompt)
-  
+
   operator = ""
   loop do
     operator = Kernel.gets().chomp()
@@ -99,26 +99,20 @@ loop do
       number1.to_i() + number2.to_i()
     when "2"
       number1.to_i() - number2.to_i()
-    when "3" 
+    when "3"
       number1.to_i() * number2.to_i()
     when "4"
       number1.to_f() / number2.to_f()
     else "The operator you entered is invalid."
     end
 
-    prompt("The result is #{result}")
-    
-    prompt("Do you want to perform another calculation? (Y to calculate again)")
-    answer = Kernel.gets().chomp()
-    break unless answer.downcase().start_with?("y")
-    # Initialize game count
-    count += 1
+  prompt("The result is #{result}")
+
+  prompt("Do you want to perform another calculation? (Y to calculate again)")
+  answer = Kernel.gets().chomp()
+  break unless answer.downcase().start_with?("y")
+  # Initialize game count
+  count += 1
 end
 
 prompt("Thank you for using the calculator! Goodbye!")
-
-
-# refactor later - There are lots of messages sprinkled throughout the program. 
-# Could we move them into some configuration file and access by key? This would 
-# allow us to manage the messages much easier, and we could even internationalize 
-# the messages. This is just a thought experiment, and no need to code this up.
