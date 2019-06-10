@@ -1,0 +1,19 @@
+mes_01: "Welcome to Calculator! Enter your name:"
+mes_02: "Hello, #{name}."
+mes_03: "Hmm... that doesn't look like a valid name."
+mes_04: "Welcome back, #{name}. You have calculated #{count} time."
+mes_05: "Welcome back, #{name}. You have calculated #{count} times."
+mes_06: "What's the first number?"
+mes_07: "What's the second number?"
+mes_08: "Hmm... that doesn't look like a valid number"
+mes_09: <<-MSG "What operation would you like to perform?
+    1) add
+    2) subtract
+    3) multiply
+    4) divide
+  MSG
+mes_10: "Must choose 1, 2, 3 or 4."
+mes_11: "The operator you entered is invalid."
+mes_12: "The result is #{result}"
+mes_13: "Do you want to perform another calculation? (Y to calculate again)"
+mes_14: "Thank you for using the calculator! Goodbye #{name}!"
