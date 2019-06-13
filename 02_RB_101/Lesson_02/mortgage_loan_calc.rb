@@ -28,14 +28,8 @@ end
 name = ""
 loop do
   prompt "Welcome to Mortgage Calculator. Please enter your name: "
-  name = gets.chomp.to_s
-  if valid_string?(name)
-    prompt "Hello, #{name}."
-  else
-    prompt "Please enter a valid name."
-  end
-  # Break out of loop and on to next execution context.
-  break
+  name = gets.chomp
+  break if valid_string?(name)
 end
 
 # Main Loop Starts Here
@@ -48,7 +42,7 @@ loop do
     loan = gets.to_i
     # Validate User Input
     if valid_number?(loan)
-      prompt "Great. You have entered a loan amount of #{loan}."
+      prompt "Great. You have entered a loan amount of $#{loan}."
       break
     else
       prompt "#{loan}, is not a valid number."
@@ -111,6 +105,14 @@ loop do
 
   # Output Results to user
   prompt("Your estimated monthly payment is $#{result}.")
-  # Stop Main Loop. End Program.
-  break
+  # Ask if user want to make another calculation
+  
+  prompt("Would you like to calculate another loan? (y/n)")
+  answer = gets.chomp
+  if answer.downcase == 'y'
+    next
+  else
+    # Stop Main Loop. End Program.
+    break
+  end
 end
