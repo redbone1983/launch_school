@@ -1,6 +1,7 @@
 # Initialize array of valid choices
 VALID_CHOICES = %w(r p s sp l)
 
+# Initialize weapons hash
 weapons = {
   rock: "r",
   paper: "p",
@@ -10,10 +11,10 @@ weapons = {
 }
 
 # Initialize empty array to store players choices
-choices_arr = []
+choices = []
 
- # Init Hash of winning arrays
- win = {
+# Initialize hash of winning combinations
+win = {
   cuts: ["s", "p"],
   covers: ["p", "r"],
   crushes: ["r", "l"],
@@ -31,16 +32,37 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+# Initialize level 1 variables
+champion = false
+game_count = 0
+human_points = 0
+comp_points = 0
 
-# Start Main Loop
+# Start Main Game Loop
 loop do
   human_choice = ""
-  # Welcome player/ Get Input
+
+  # Welcome player/ Get Input Loop
   loop do
-    prompt("Welcome to Rock, Paper, Scissors, Spock, Lizard.")
-    prompt("Please enter: \n[r] for Rock\n[p] for Paper\n[s] for scissors\n[sp] for Spock\n[l] for lizard")
+    welcome_prompt = <<-MSG
+    Welcome to Rock, Paper, Scissors, Spock, Lizard.
+    "Best out of 5 wins. Good Luck!"
+    MSG
+
+    weapons_prompt = <<-MSG
+    Please choose your weapon:
+      'r' for Rock
+      'p' for Paper
+      's' for Scissors
+      'sp' for Spock
+      'l' for Lizard
+    MSG
+
+    # Use Ternary Operator for optional greeting for return users
+    game_count == 0 ? puts(welcome_prompt) : nil
+    puts(weapons_prompt)
     human_choice = gets.chomp
-    # Validate input
+
     # Validate human input
     if VALID_CHOICES.include?(human_choice)
       break
@@ -48,28 +70,53 @@ loop do
       prompt("Please enter a valid input.")
     end
   end
-  # Convert letter to word
-  human_weapon = weapons.key(human_choice)
+
   # Get computer input
   computer_choice = VALID_CHOICES.sample
-  comp_weapon = weapons.key(computer_choice)
-  
-  choices_arr[0] = human_choice
-  choices_arr[1] = computer_choice
-  
-  if win.has_value?(choices_arr)
-    prompt("You won! Your #{human_weapon} #{win.key(choices_arr)} #{comp_weapon}!")
-  elsif human_weapon == comp_weapon
-    prompt("There is a tie. #{comp_weapon} kills #{human_weapon}.")
+
+  # Convert letter input to word
+  h_weapon = weapons.key(human_choice)
+  c_weapon = weapons.key(computer_choice)
+
+  # Assign ordered choices to array
+  choices[0] = human_choice
+  choices[1] = computer_choice
+
+  # Winner Prompt & tally points
+  if win.value?(choices)
+    game_count += 1
+    human_points += 1
+    prompt("You won this round!")
+    prompt("Your #{h_weapon} #{win.key(choices)} #{c_weapon}!")
+  elsif h_weapon == c_weapon
+    prompt("There is a tie. #{c_weapon} kills #{h_weapon}.")
   else
-    prompt("You lost! Computer's #{comp_weapon} #{win.key(choices_arr.reverse)} #{human_weapon}!")
+    comp_points += 1
+    prompt("You lost this round!")
+    prompt("Computer's #{c_weapon} #{win.key(choices.reverse)} #{h_weapon}!")
+  end
+
+  prompt("Current Score is You: #{human_points} & Computer: #{comp_points}.")
+
+  # Check points for winner
+  if human_points == 5
+    champion = true
+    prompt("You are the champion!")
+  elsif comp_points == 5
+    champion = true
+    prompt("Computer reigns supreme!")
   end
 
   # Ask if user want to play again
-  prompt("Do you want to play again?(y/n)")
-  answer = gets.chomp
-  # End Game if input is anything other that "y"
-  break unless answer.downcase.start_with?("y")
+  if champion
+    prompt("Do you want to play again?(y/n)")
+    answer = gets.chomp
+    if answer.downcase().start_with?("y")
+      next
+    else
+      break
+    end
+  end
 end
 
 prompt("Thanks for playing. Goodbye!")
