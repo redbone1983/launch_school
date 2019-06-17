@@ -1,11 +1,25 @@
-# 1. [1, 2, 3]
+# 1. =>
+        # 1
+        # 2
+        # 3
+        # 4
+
 # 2. 
+
   # 1. != combines the bang (NOT) operator with the = assignment operator.
   # != should be used in a conditional statement where the operands are expected not to match
-
-  # 2. ! - This check if the value of username falsy
-  # 3. words.uniq! makes it so that the words object can be mutated by the .uniq method directly
-  # 4.  
+  
+  # 2. ! - This negates an objects boolean value
+  
+  # 3. words.uniq! usually refers named methods that are destructive/mutable. 
+  
+  # 4. condition ? true : false => used in ternary operator
+  
+  # 5. a_method? is not a part of the ruby syntax but a naming convention for methods that are expected to return a boolean value
+  
+  # 6. !!<object> turns an object into their boolean value => \
+  # !!user_name => true
+  # !!nil => false
 
 # 3. advice = "Few things in life are as important as house training your pet dinosaur."
 
@@ -14,7 +28,7 @@
 
 # puts advice
 
-# 4. 
+# 4. Both methods are mutate the caller and don't have a ! at the end
 
 # numbers = [1, 2, 3, 4, 5]
 
@@ -55,14 +69,44 @@
 
 # 8. 
 
-flintstones = ["Fred", "Wilma"]
-flintstones += ["Barney", "Betty"]
-flintstones += ["BamBam", "Pebbles"]
+# flintstones = ["Fred", "Wilma"]
+# flintstones += ["Barney", "Betty"]
+# flintstones += ["BamBam", "Pebbles"]
 
-p flintstones #=> ["Fred", "Wilma", "Barney", "Betty", "BamBam", "Pebbles"]
+# p flintstones #=> ["Fred", "Wilma", "Barney", "Betty", "BamBam", "Pebbles"]
+
+# my_flatten by 1 level
+def my_flatten(arr)
+  flat = []
+  arr.each do |item|
+   if item.class == Array
+    item.each { |value| flat << value }
+   else
+    flat << item
+   end
+  end
+  flat
+end
+
+
+def recurse_flatten(array, results = [])
+  array.each do |element|
+    if element.class == Array
+      recurse_flatten(element, results)
+    else
+      results << element
+    end
+  end
+  results
+end
+  
+
+flintstones = ["Fred", ["Wilma", ["Jetsons"]], ["Barney", ["Betty"]], ["BamBam", "Pebbles"]]
+
+p recurse_flatten(flintstones)
 
 # 9. 
 
-# flintstones = { "Fred" => 0, "Wilma" => 1, "Barney" => 2, "Betty" => 3, "BamBam" => 4, "Pebbles" => 5 }
+flintstones = { "Fred" => 0, "Wilma" => 1, "Barney" => 2, "Betty" => 3, "BamBam" => 4, "Pebbles" => 5 }
 
-# p flintstones.rassoc(2) #=> ["Barney", 2]
+p flintstones.rassoc(2) #=> ["Barney", 2]
