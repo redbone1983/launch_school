@@ -289,6 +289,8 @@ loop do
     # Validate human input
     if VALID_CHOICES.include?(human_choice)
       game_count += 1
+      # Clears the terminal after each valid input 
+      puts %x[clear]
       break
     else
       prompt("Please enter a valid input.")
@@ -343,6 +345,10 @@ loop do
     prompt("Do you want to play again?(y/n)")
     answer = gets.chomp
     if answer.downcase().start_with?("y")
+      # Reset champion's state and points
+      champion = false
+      human_points = 0
+      comp_points = 0
       next
     else
       break
