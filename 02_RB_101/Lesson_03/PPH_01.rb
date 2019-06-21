@@ -33,27 +33,26 @@
 # end
 
 # My refactored version
-def is_an_ip_number?(num)
-  (0..255).cover?(num) 
-end
+# def is_an_ip_number?(num)
+#   (0..255).cover?(num) 
+# end
 
-def dot_separated_ip_address?(input_string)
-  return false unless input_string.class == String
+# def dot_separated_ip_address?(input_string)
+#   return false unless input_string.class == String
   
-  dot_separated_words = input_string.split(".")
+#   dot_separated_words = input_string.split(".")
   
-  return false unless dot_separated_words.size == 4 
+#   return false unless dot_separated_words.size == 4 
     
-    dot_separated_words.each do |word|
-      word = word.to_i
-      return false unless is_an_ip_number?(word)
-    end
+#     dot_separated_words.each do |word|
+#       word = word.to_i
+#       return false unless is_an_ip_number?(word)
+#     end
 
-  true
-end
+#   true
+# end
 
-p dot_separated_ip_address?("10.4.5.11") #=> true
-p dot_separated_ip_address?("4.5.5") #=> false
-p dot_separated_ip_address?("1.2.3.4.5") #=> false
-p dot_separated_ip_address?(0) #=> false
-
+# p dot_separated_ip_address?("10.4.5.11") #=> true
+# p dot_separated_ip_address?("4.5.5") #=> false
+# p dot_separated_ip_address?("1.2.3.4.5") #=> false
+# p dot_separated_ip_address?(0) #=> false
