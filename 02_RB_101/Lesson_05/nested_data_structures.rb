@@ -1,18 +1,18 @@
 # Shallow Copy and Variable Pointers
 
-arr1 = ["a", "b", "c"]
+# arr1 = ["a", "b", "c"]
 # arr2 variable is initialized and points to -> 
 # the returned value of .dup method -> 
 # which is the Array object ["a", "b", "c"] that the variable arr1 points to
 
 # A shallow copy is made of the Array object that arr1 points to
 # and arr2 points to this shallow copy
-arr2 = arr1.dup
+# arr2 = arr1.dup
 
 # The address for each Array object is different
 
-p arr1.object_id #=> 70331893304160
-p arr2.object_id #=> 70331893304140
+# p arr1.object_id #=> 70331893304160
+# p arr2.object_id #=> 70331893304140
 
 # The address for each String object remains unchanged
 
@@ -29,9 +29,33 @@ p arr2.object_id #=> 70331893304140
 # p arr1[1].object_id #=> 70358216805620
 # p arr2[1].object_id #=> 70358216805620
 
-# # Because .dup only copies the outer Array Object and not each String Object,
-# # Both arr1 & arr2 reflect the changes returned from the .upcase! method
+# # Because .dup only copies the outer Array Object and still share each String Object,
+# # Both arr1 & arr2 reflect the changes returned from the .upcase! method because it 
+# is direvtly invoked on the shared object and not on the collection (Array Object)
 
 # arr2 # => ["a", "B", "c"]
 # arr1 # => ["a", "B", "c"]
+
+# Freezing Objects
+# .freeze method prevents forther modification to an obj.
+
+# .clone preserves the frozen state of an object
+# arr1 = ["a", "b", "c"].freeze
+# arr2 = arr1.clone
+# arr2 << "d" #=> RunTime Error: can't modify frozen array
+
+# .dup doesnt preserve the frozen state of an object
+# arr1 = ["a", "b", "c"].freeze
+# p "arr1 id: #{arr1.object_id} before .dup method"
+# arr2 = arr1.dup
+# p "arr2 id: #{arr2.object_id} before << d"
+# arr2 << "d"
+
+# p arr2 #=> ["a", "b", "c", "d"]
+# p arr1 #=> ["a", "b", "c"]
+
+# p "arr2 id: #{arr2.object_id}"
+# p "arr1 id: #{arr1.object_id}"
+
+
 
