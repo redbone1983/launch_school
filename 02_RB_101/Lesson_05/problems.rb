@@ -4,6 +4,8 @@
 
 arr = ['10', '11', '9', '7', '8']
 
+arr.sort { |a, b| b.to_i <=> a.to_i }
+
 # Practice Problem 2
 
 # How would you order this array of hashes based on the year 
