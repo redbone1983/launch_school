@@ -87,9 +87,9 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    if brd.values_at(line[0], line[1], line[2]).all?(PLAYER_MARKER)
+    if brd.values_at(*line).all?(PLAYER_MARKER)
       return "You"
-    elsif brd.values_at(line[0], line[1], line[2]).all?(COMPUTER_MARKER)
+    elsif brd.values_at(*line).all?(COMPUTER_MARKER)
       return "Computer"
     end
   end
