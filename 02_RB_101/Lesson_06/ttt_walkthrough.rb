@@ -3,7 +3,6 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
-
 def prompt(str)
   puts "=> #{str}"
 end
@@ -31,7 +30,7 @@ end
 def initialize_board
   # Initialize empty hash object
   new_board = {}
-  (1..9).each {|num| new_board[num] = INITIAL_MARKER}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
@@ -40,7 +39,7 @@ def empty_squares(brd)
   # Iterate through an Array object of Integer keys
   # Select all Integers whose values are an empty string
   # Return Selected Integers in a new Array object
-  brd.keys.select {|num| brd[num] == INITIAL_MARKER}
+  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
 # Destructively Modify Board
@@ -51,25 +50,25 @@ def player_places_piece!(brd)
   # Start Player's Turn Loop
   loop do
     prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
-    
+
     # Assign Integer Object to square
     square = gets.to_i
+
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that's not a valid choice."
   end
-  
+
   # Assign 'X' as value to player's chosen square
   brd[square] = PLAYER_MARKER
 end
 
 # Destructively Modify Board
 def computer_places_piece!(brd)
+  # Assign Integer Object to square
+  square = empty_squares(brd).sample
 
-    # Assign Integer Object to square
-    square = empty_squares(brd).sample
-    
-    # Assign 'O' as value to computer's chosen square
-    brd[square] = COMPUTER_MARKER
+  # Assign 'O' as value to computer's chosen square
+  brd[square] = COMPUTER_MARKER
 end
 
 # Check if board is full
@@ -85,40 +84,35 @@ end
 def detect_winner(brd)
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                  [[1, 5, 9], [3, 5, 7]]              # diagonals
+                  [[1, 5, 9], [3, 5, 7]] # diagonals
 
   winning_lines.each do |line|
-    if  
-      brd[line[0]] == PLAYER_MARKER &&
-      brd[line[1]] == PLAYER_MARKER &&
-      brd[line[2]] == PLAYER_MARKER
-    return "you"
-    elsif 
-      brd[line[0]] == COMPUTER_MARKER &&
-      brd[line[1]] == COMPUTER_MARKER &&
-      brd[line[2]] == COMPUTER_MARKER
-    return "Computer"
+    if brd[line[0]] == PLAYER_MARKER &&
+       brd[line[1]] == PLAYER_MARKER &&
+       brd[line[2]] == PLAYER_MARKER
+      return "you"
+    elsif brd[line[0]] == COMPUTER_MARKER &&
+          brd[line[1]] == COMPUTER_MARKER &&
+          brd[line[2]] == COMPUTER_MARKER
+      return "Computer"
     end
-    
   end
-  
+
   nil
 end
 
 # Main Game Loop
 loop do
-# Keep track of game state
-board = initialize_board
-
+  # Keep track of game state
+  board = initialize_board
   loop do
     display_board(board)
-    
+
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
-    
+
     computer_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
-
   end
 
   display_board(board)
