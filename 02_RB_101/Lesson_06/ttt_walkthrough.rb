@@ -1,4 +1,3 @@
-############################################################
 # Initialize Game Constants
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
@@ -67,9 +66,22 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def ai_defense!(brd, win_moves)
+  win_moves.each do |line|
+    if brd.values_at(*line).first(2).all?("X") &&
+      empty_squares(brd).include?(line.last)
+        return brd[line.last] = "O"
+    elsif brd.values_at(*line).last(2).all?("X") &&
+      empty_squares(brd).include?(line.first)
+        return brd[line.first] = "O"
+    end   
+  end
+  computer_places_piece!(brd)
+end
+
 # Destructively Modify Board
 def computer_places_piece!(brd)
-  square = empty_squares(brd).include?(square)
+  square = empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
 
@@ -83,11 +95,10 @@ def someone_won?(brd)
   !!detect_winner(brd)
 end
 
-
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).all?(PLAYER_MARKER)
-      return "You"
+      return "Player"
     elsif brd.values_at(*line).all?(COMPUTER_MARKER)
       return "Computer"
     end
@@ -106,7 +117,7 @@ loop do
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
 
-    computer_places_piece!(board)
+    ai_defense!(board, WINNING_LINES)
     break if someone_won?(board) || board_full?(board)
   end
 

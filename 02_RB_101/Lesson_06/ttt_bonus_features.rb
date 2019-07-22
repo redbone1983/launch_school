@@ -1,177 +1,91 @@
-# Initialize Game Constants
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]]              # diagonals
-INITIAL_MARKER = ' '
-PLAYER_MARKER = 'X'
-COMPUTER_MARKER = 'O'
-
-# Computer AI: Defense
-
-# The computer currently picks a square at random. That's not very interesting. Let's make the computer defensive minded, so that if there's an immediate threat, then it will defend the 3rd square. We'll consider an "immediate threat" to be 2 squares marked by the opponent in a row. If there's no immediate threat, then it will just pick a random square.
-
-AI_DEFENSE = [[1, 2], [2, 3], [4, 5], [5, 6], [7, 8], [8, 9]] + # rows
-             [[1, 4], [4, 7], [2, 5], [5, 8], [3, 6], [6, 9]] + # columns
-             [[1, 5], [5, 9], [3, 5], [5, 7]]                   # diagonals
 
 
 
-def prompt(str)
-  puts "=> #{str}"
-end
-
-def joinor(arr, j1 = ', ', j2 = 'or')
-  str = ""
-  arr.each do |item|
-    str << case item
-    when arr[-1]
-      "#{j2} #{item}"
-    when arr[0] && arr.length == 2
-      "#{item} "
-    else
-      "#{item}#{j1}"
-    end
-  end
-  str
-end
-
-def display_board_key(brd)
-  system('clear') || system('cls')
-  puts "BOARD KEY:"
-  puts
-  puts "     |     |"
-  puts "  1  |  2  |  3  "
-  puts '     |     |     '
-  puts '-----+-----+-----'
-  puts '     |     |      '
-  puts "  4  |  5  |  6  "
-  puts '     |     |      '
-  puts '-----+-----+-----'
-  puts '     |     |      '
-  puts "  7  |  8  |  9  "
-  puts '     |     |     '
-  puts ''
-  puts "========================================"
-end
-
-# rubocop:disable Metrics/AbcSize
-def display_board(brd)
-  display_board_key
-  puts "You are #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
-  puts ""
-  puts "     |     |"
-  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
-  puts "     |     |"
-  puts "-----+-----+-----"
-  puts "     |     |"
-  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
-  puts "     |     |"
-  puts "-----+-----+-----"
-  puts "     |     |"
-  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
-  puts "     |     |"
-  puts ""
-end
-# rubocop:enable Metrics/AbcSize
-
-# Creates new board
-def initialize_board
-  new_board = {}
-  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
-  new_board
-end
+board = {
+  1 => "X", 2 => "X", 3 => "",
+  4 => "", 5 => "", 6 => "",
+  7 => "", 8 => "", 9 => ""
+}
 
 def empty_squares(brd)
-  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+  # Iterate through an Array object of Integer keys
+  # Select all Integers whose values are an empty string
+  # Return Selected Integers in a new Array object
+  brd.keys.select { |num| brd[num] == "" }
 end
 
-def player_places_piece!(brd)
-  square = ''
-
-  loop do
-    prompt "Choose a square (#{joinor(empty_squares(brd))})"
-    square = gets.to_i
-
-    break if empty_squares(brd).include?(square)
-    prompt "Sorry, that's not a valid choice."
+def ai_defense!(brd, win_moves)
+  win_moves.each do |line|
+    if brd.values_at(*line).first(2).all?("X") &&
+      empty_squares(brd).include?(line.last)
+        return brd[line.last] = "O"
+    elsif brd.values_at(*line).last(2).all?("X") &&
+      empty_squares(brd).include?(line.first)
+        return brd[line.first] = "O"
+    end   
   end
-
-  brd[square] = PLAYER_MARKER
+  computer_places_piece!(brd)
 end
 
-def ai_defense(brd)
+ai_defense(board, WINNING_LINES)
+
+p board
+
+
+ 
+# p board.values_at(*win).last(2) == offense
+
+# if board.values_at(*win).all?("X")
+
+
+# Check player moves
+# player_move = board.values.first(2)
+# puts "Player Moves: #{player_move}"
+
+# # Check if first two keys in board
+# square_nums = board.keys.first(2)
+# p "Board key's 1 & 2: #{square_nums}"
+
+# # Check first to numbers in winning lines arr
+# defend1 = WINNING_LINES.dig(0).first(2)
+# p "Winning Lines: #{defend1}"
+
+# # Check if player is about to win
+# if square_nums == defend1 && player_move == ["X", "X"]
+#   # Block players win
+#   board[3] = "O"
+#   p board
+# end
+
+
+
+
+
+# def ai_defense(brd, wins)
+#     wins.map do |line|
+#       defense1 = line.first(2)
+#       defense2 = line.last(2)
+
+#       # If this is true
+#       if brd.keys.first(2) == defense1 && 
+#       # And this is true
+#       brd.values.first(2).include?("X")
+#       # Computer makes this move
+#       brd[3] = "O"
+#       end
+#     end
+#    p brd
+#     # p brd.values.last(2).include?("X")
+#     # p brd.values_at().include?("X")
   
+# end
 
-end
-
-def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
-end
-
-def board_full?(brd)
-  empty_squares(brd).empty?
-end
-
-def someone_won?(brd, p_hsh, c_hsh)
-  !!detect_winner(brd, p_hsh, c_hsh)
-end 
+# p ai_defense(board, WINNING_LINES)
+# # "Yes" if brd.values_at(num).include?("X")
+# # # Destuctive Method
 
 
-def detect_winner(brd, p_hsh, c_hsh)
-  WINNING_LINES.each do |line|
-    if brd.values_at(*line).all?(PLAYER_MARKER)
-      p_hsh[:score] += 1
-      p_hsh[:round_win] = true
-      return p_hsh[:name]
-    elsif brd.values_at(*line).all?(COMPUTER_MARKER)
-      c_hsh[:score] += 1
-      c_hsh[:round_win] = true
-      return c_hsh[:name]
-    end
-  end
-  nil
-end
-
-
-## NEED TO KEEP SCORE WITHOUT GLOBAL VARIABLES
-# player_score = 0
-# computer_score = 0
-######
-
-# Main Game Loop
-loop do
-  # Keep track of game state
-  board = initialize_board
-  
-  player = { :name => "Maya", :score => 0, :round_win =>false, :five_wins=> false }
-  computer = { :name => "ChromeOS", :score => 0, :round_win =>false, :five_wins=> false } 
-
-
-    loop do
-      display_board(board)
-
-      player_places_piece!(board)
-      break if someone_won?(board, player, computer) || board_full?(board) 
-      
-      computer_places_piece!(board)
-      break if someone_won?(board, player, computer) || board_full?(board)
-    
-    end
-
-    display_board(board)
-
-    if someone_won?(board, player, computer) 
-      prompt "#{detect_winner(board, player, computer)} wins!!!"
-    else
-      prompt "There is a tie."
-    end
-  
-  prompt "Play Again?: (Enter y or n)"
-  answer = gets.chomp
-
-  break unless answer.downcase.start_with?('y')
-end
-
-"Thanks for playing TIC TAC TOE!"
-
+# # p ai_defense(WINNING_LINES)
