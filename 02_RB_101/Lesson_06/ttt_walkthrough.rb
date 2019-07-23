@@ -66,6 +66,20 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+# I need to DRY up ai_offense & ai_defense
+def ai_offense!(brd, win_moves)
+  win_moves.each do |line|
+    if brd.values_at(*line).first(2).all?("O") &&
+      empty_squares(brd).include?(line.last)
+        return brd[line.last] = "O"
+    elsif brd.values_at(*line).last(2).all?("O") &&
+      empty_squares(brd).include?(line.first)
+        return brd[line.first] = "O"
+    end  
+  end
+  computer_places_piece!(brd)
+end
+
 def ai_defense!(brd, win_moves)
   win_moves.each do |line|
     if brd.values_at(*line).first(2).all?("X") &&
@@ -76,7 +90,7 @@ def ai_defense!(brd, win_moves)
         return brd[line.first] = "O"
     end   
   end
-  computer_places_piece!(brd)
+  ai_offense!(brd, win_moves)
 end
 
 # Destructively Modify Board
