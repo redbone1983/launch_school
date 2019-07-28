@@ -1,3 +1,5 @@
+require 'rubocop'
+
 # Initialize Game Constants
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
@@ -5,6 +7,8 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+FIRST_MOVE = [ "choose", "player", "computer" ]
+WINS = 5
 
 def prompt(str)
   puts "=> #{str}"
@@ -13,7 +17,13 @@ end
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear'
+  puts "========================================="
+  puts "WELCOME TO THE GAME OF TIC TAC TOE!"
+  puts ""
   puts "You are #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  puts ""
+  puts "Best out of 5 games wins. GOOD LUCK!"
+  puts "========================================="
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -40,9 +50,6 @@ end
 
 # Inspect board state
 def empty_squares(brd)
-  # Iterate through an Array object of Integer keys
-  # Select all Integers whose values are an empty string
-  # Return Selected Integers in a new Array object
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
@@ -66,37 +73,59 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-# I need to DRY up ai_offense & ai_defense
-def ai_offense!(brd, win_moves)
-  win_moves.each do |line|
-    if brd.values_at(*line).first(2).all?("O") &&
-      empty_squares(brd).include?(line.last)
-        return brd[line.last] = "O"
-    elsif brd.values_at(*line).last(2).all?("O") &&
-      empty_squares(brd).include?(line.first)
-        return brd[line.first] = "O"
-    end  
+def ai_assist!(win_moves, brd, marker)
+  if brd.values_at(*win_moves).count(marker) == 2
+    brd.select{|k,v| win_moves.include?(k) && v == INITIAL_MARKER}.keys.first
+  else
+    nil
   end
-  computer_places_piece!(brd)
 end
 
-def ai_defense!(brd, win_moves)
-  win_moves.each do |line|
-    if brd.values_at(*line).first(2).all?("X") &&
-      empty_squares(brd).include?(line.last)
-        return brd[line.last] = "O"
-    elsif brd.values_at(*line).last(2).all?("X") &&
-      empty_squares(brd).include?(line.first)
-        return brd[line.first] = "O"
-    end   
-  end
-  ai_offense!(brd, win_moves)
-end
-
-# Destructively Modify Board
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+
+  # offense
+  WINNING_LINES.each do |line|
+    square = ai_assist!(line, brd, COMPUTER_MARKER)
+    break if square
+  end
+
+  # defense
+  WINNING_LINES.each do |line|
+    square = ai_assist!(line, brd, PLAYER_MARKER)
+    break if square
+  end
+
+  # just picks a random square
+  if empty_squares(brd).include?(5)
+    square = 5
+  else
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
+end
+
+def players_choice!(brd)
+  prompt "Please choose who goes first: "
+  prompt "Enter 'P' for Player or 'C' for Computer"
+  choice = gets.chomp
+  choice = choice.upcase!
+  if choice == "P"
+    player_places_piece!(brd)
+  elsif choice == "C"
+    computer_places_piece!(brd)
+  end
+end
+
+def place_piece!(brd, name)
+  if name == "choose"
+    players_choice!(brd)
+  elsif name == "player"
+    player_places_piece!(brd)
+  elsif name == "computer"
+    computer_places_piece!(brd)
+  end
 end
 
 # Check if board is full
@@ -121,32 +150,64 @@ def detect_winner(brd)
   nil
 end
 
-# Main Game Loop
+def alternate_player(curr_player)
+  if curr_player == "player"
+    return "computer"
+  elsif curr_player == "computer"
+    return "player"
+  end
+end
+
+def display_score(brd, score_brd)
+  puts "SCORE: Player = #{score_brd[:player]}. Computer = #{score_brd[:computer]}."
+  puts "========================================"
+end
+
+current_player = FIRST_MOVE.sample
+# Best out of 5 score loop
 loop do
-  # Keep track of game state
-  board = initialize_board
+  # Keep track of score
+  
+  score = { player: 0, computer: 0 }
+  # Main Game Loop
   loop do
+    board = initialize_board
+    loop do
+      display_board(board)
+      display_score(board, score) 
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
+      break if someone_won?(board) || board_full?(board)
+    end
+
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+    else
+      prompt "It's a tie."
+    end
+
     display_board(board)
+    
+    if detect_winner(board) == "Player"
+      score[:player] += 1
+    elsif detect_winner(board) == "Computer"
+      score[:computer] += 1
+    end
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
 
-    ai_defense!(board, WINNING_LINES)
-    break if someone_won?(board) || board_full?(board)
+  if score[:player] == WINS
+    prompt "Player is 5 time champion!"
+  elsif score[:computer] == WINS
+    prompt "Computer is 5 time champion!"
   end
 
-  display_board(board)
-
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
+  break if score[:player] == WINS || score[:computer] == WINS
   end
 
   prompt "Play Again?: (Enter y or n)"
   answer = gets.chomp
 
-  break unless answer.downcase.start_with?('y')
+break unless answer.downcase.start_with?('y')
 end
 
 "Thanks for playing TIC TAC TOE!"
