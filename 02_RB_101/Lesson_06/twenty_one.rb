@@ -14,14 +14,13 @@ def total(cards)
 
   score = 0
   values.each do |value|
-    score +=  case value
-              when value.to_i == 0 # J, Q, K
-                10
-              when "A"
-                11
-              else
-                value.to_i
-              end
+    if value == "A"
+      score += 11
+    elsif value.to_i == 0 # J, Q, K
+      score += 10
+    else
+      score += value.to_i
+    end
   end
 
   # Fix for Aces
@@ -32,13 +31,11 @@ def total(cards)
   score
 end
 
-def busted?(cards)
-  total(cards) > 21
+def busted?(total_score)
+  total_score > 21
 end
 
-def detect_result(dealer_hand, player_hand)
-  player_total = total(player_hand)
-  dealer_total = total(dealer_hand)
+def detect_result(dealer_total, player_total)
 
   if player_total > 21
     :player_busted
@@ -53,8 +50,8 @@ def detect_result(dealer_hand, player_hand)
   end
 end
 
-def display_result(dealer_hand, player_hand)
-  result = detect_result(dealer_hand, player_hand)
+def display_result(dealer_total, player_total)
+  result = detect_result(dealer_total, player_total)
 
   case result
   when :player_busted
@@ -83,16 +80,17 @@ loop do
   deck = initialize_deck
   player_hand = []
   dealer_hand = []
-
+  
   # DEAL 2_hand EACH
   2.times do
     player_hand << deck.pop
     dealer_hand << deck.pop
   end
 
+  player_total = total(player_hand)
+  
   prompt "Dealer has #{dealer_hand[0]} and ?"
-  prompt "You have: #{player_hand[0]} and #{player_hand[1]}."
-  prompt "Total: #{total(player_hand)}."
+  prompt "You have: #{player_hand[0]} and #{player_hand[1]}. Total: #{player_total}."
 
   # player turn
   loop do
@@ -106,47 +104,49 @@ loop do
 
     if player_turn == 'h'
       player_hand << deck.pop
+      player_total = total(player_hand)
       prompt "You chose to hit!"
       prompt "Your hand is now: #{player_hand}"
-      prompt "Your total is now: #{total(player_hand)}"
+      prompt "Your total is now: #{player_total}"
     end
 
-    break if player_turn == 's' || busted?(player_hand)
+    break if player_turn == 's' || busted?(player_total)
   end
 
-  if busted?(player_hand)
-    display_result(dealer_hand, player_hand)
+  if busted?(player_total)
+    display_result(dealer_total, player_total)
     play_again? ? next : break
   else
-    prompt "You stayed at #{total(player_hand)}"
+    prompt "You stayed at #{player_total}"
   end
 
   # dealer turn
   prompt "Dealer turn..."
 
-  loop do
-    break if total(dealer_hand) >= 17
+  dealer_total = total(dealer_hand)
 
+  loop do
+    break if dealer_total >= 17
     prompt "Dealer hits!"
     dealer_hand << deck.pop
     prompt "Dealer's_hand are now: #{dealer_hand}"
   end
 
-  if busted?(dealer_hand)
-    prompt "Dealer total is now: #{total(dealer_hand)}"
-    display_result(dealer_hand, player_hand)
+  if busted?(dealer_total)
+    prompt "Dealer total is now: #{dealer_total}"
+    display_result(dealer_total, player_total)
     play_again? ? next : break
   else
-    prompt "Dealer stays at #{total(dealer_hand)}"
+    prompt "Dealer stays at #{dealer_total}"
   end
 
   # both player and dealer stays - compare_hand!
   puts "=============="
-  prompt "Dealer has #{dealer_hand}, for a total of: #{total(dealer_hand)}"
-  prompt "Player has #{player_hand}, for a total of: #{total(player_hand)}"
+  prompt "Dealer has #{dealer_hand}, for a total of: #{dealer_total}"
+  prompt "Player has #{player_hand}, for a total of: #{player_total}"
   puts "=============="
 
-  display_result(dealer_hand, player_hand)
+  display_result(dealer_total, player_total)
 
   break unless play_again?
 end
