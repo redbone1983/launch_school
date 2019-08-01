@@ -1,6 +1,4 @@
-DEALER = { :name => "Gentleman Jack", :hand => [], :score => 0 }
-HUMAN = { :name => "Maya", :hand => [], :score => 0 }
-SUITS = [ "♥", "♠", "♦", "♣"]
+SUITS = ["♥", "♠", "♦", "♣"]
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
 def prompt(str)
@@ -12,19 +10,18 @@ def initialize_deck
 end
 
 def total(cards)
-  values = cards.map {|card| card[1] }
-  
+  values = cards.map { |card| card[1] }
+
   score = 0
   values.each do |value|
-    
-    case value
-    when value.to_i == 0 # J, Q, K
-      score += 10
-    when "A"
-      score += 11
-    else
-      score += value.to_i
-    end
+    score +=  case value
+              when value.to_i == 0 # J, Q, K
+                10
+              when "A"
+                11
+              else
+                value.to_i
+              end
   end
 
   # Fix for Aces
@@ -57,8 +54,8 @@ def detect_result(dealer_hand, player_hand)
 end
 
 def display_result(dealer_hand, player_hand)
-  result =  detect_result(dealer_hand, player_hand)
-  
+  result = detect_result(dealer_hand, player_hand)
+
   case result
   when :player_busted
     prompt "You busted! Dealer wins!"
@@ -84,9 +81,9 @@ end
 loop do
   prompt "Welcome to 21!"
   deck = initialize_deck
-  player_hand = HUMAN[:hand]
-  dealer_hand = DEALER[:hand]
-  
+  player_hand = []
+  dealer_hand = []
+
   # DEAL 2_hand EACH
   2.times do
     player_hand << deck.pop
@@ -94,9 +91,10 @@ loop do
   end
 
   prompt "Dealer has #{dealer_hand[0]} and ?"
-  prompt "You have: #{player_hand[0]} and #{player_hand[1]}, for a total of #{total(player_hand)}."
-  
- # player turn
+  prompt "You have: #{player_hand[0]} and #{player_hand[1]}."
+  prompt "Total: #{total(player_hand)}."
+
+  # player turn
   loop do
     player_turn = nil
     loop do
@@ -154,5 +152,3 @@ loop do
 end
 
 prompt "Thank you for playing Twenty-One! Good bye!"
-
-
