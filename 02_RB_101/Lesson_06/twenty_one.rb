@@ -1,154 +1,261 @@
+#######################
+# CREATE GAME CONSTANTS
+#######################
+
+HUMAN = { name: "Your", hand: [], score: 0, wins: 0, move: "stay", bust: false }
+DEALER = { name: "Dealer's", hand: [], score: 0, wins: 0, move: "stay", bust: false }
 SUITS = ["♥", "♠", "♦", "♣"]
-VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
+
+#######################
+# CREATE DECK OF CARDS
+#######################
+
+def initialize_deck
+  VALUES.product(SUITS).shuffle
+end
+
+########################
+# OUTPUT/DISPLAY METHODS
+########################
 
 def prompt(str)
   puts "=> #{str}"
 end
 
-def initialize_deck
-  SUITS.product(VALUES).shuffle
-end
-
-def total(cards)
-  values = cards.map { |card| card[1] }
-
-  score = 0
-  values.each do |value|
-    if value == "A"
-      score += 11
-    elsif value.to_i == 0 # J, Q, K
-      score += 10
-    else
-      score += value.to_i
+def display_hand(player)
+  hand = "#{player[:name]} hand is "
+  if player == HUMAN
+    player[:hand].each do |card|
+      hand << "#{card} "
     end
+  elsif player == DEALER
+    hand << "#{player[:hand].first} ['unknown']"
   end
-
-  # Fix for Aces
-  values.select { |value| value == "A" }.count.times do
-    score -= 10 if score > 21
-  end
-
-  score
+  puts
+  puts "#{hand}"
+  puts
 end
 
-def busted?(total_score)
-  total_score > 21
+def display_score(player)
+  puts
+  puts "#{player[:name]} score is #{player[:score]}."
+  puts
 end
 
-def detect_result(dealer_total, player_total)
+################
+# RETURN METHODS
+################
 
-  if player_total > 21
-    :player_busted
-  elsif dealer_total > 21
-    :dealer_busted
-  elsif dealer_total < player_total
-    :player
-  elsif dealer_total > player_total
-    :dealer
-  else
-    :tie
+def tally_score(player)
+  # Reset players score
+  player[:score] = 0
+  
+  player[:hand].each do |card|
+    value = card.first
+    
+    if value.class == Integer
+      player[:score] += value 
+    elsif value.class == String
+      player[:score] += 10
+    elsif value.class == Symbol
+      player[:score] += 11
+    end
+
   end
+
+  player[:score]
 end
 
-def display_result(dealer_total, player_total)
-  result = detect_result(dealer_total, player_total)
-
-  case result
-  when :player_busted
-    prompt "You busted! Dealer wins!"
-  when :dealer_busted
-    prompt "Dealer busted! You win!"
-  when :player
-    prompt "You win!"
-  when :dealer
-    prompt "Dealer wins!"
-  when :tie
-    prompt "It's a tie!"
+def player_bust?(player)
+  if player[:score] > 21
+    player[:bust] = true 
   end
+  player[:bust]
+end
+
+def dealer_bust?(dealer)
+  if dealer[:score] > 21
+    dealer[:bust] = true 
+  end
+  dealer[:bust]
+end
+
+def player_win?(player, dealer)
+  player[:score] <= 21 && player[:score] > dealer[:score]
+end
+
+def dealer_win?(dealer, player)
+  dealer[:score] <= 21 && dealer[:score] > player[:score]
 end
 
 def play_again?
-  puts "-------------"
-  prompt "Do you want to play again? (y or n)"
+  puts
+  prompt "To play again, enter 'y'"
+  puts
   answer = gets.chomp
-  answer.downcase.start_with?('y')
+  answer == "y"
 end
 
-# GAME LOOP
+def five_wins?(player)
+  player[:wins] == 5
+end
+
+#######################
+# START GAME OUTER LOOP
+#######################
+
 loop do
-  prompt "Welcome to 21!"
+  system "clear"
+  
   deck = initialize_deck
-  player_hand = []
-  dealer_hand = []
   
-  # DEAL 2_hand EACH
+  # reset player's hand
+  HUMAN[:hand] = []
+  DEALER[:hand] = []
+
+  # Deal 2 card each
   2.times do
-    player_hand << deck.pop
-    dealer_hand << deck.pop
+    HUMAN[:hand] << deck.pop
+    DEALER[:hand] << deck.pop
   end
+    
+  # Tally score
+  tally_score(HUMAN)
+  tally_score(DEALER)
 
-  player_total = total(player_hand)
+  #############################
+  # START INNER HUMAN MOVE LOOP
+  #############################
   
-  prompt "Dealer has #{dealer_hand[0]} and ?"
-  prompt "You have: #{player_hand[0]} and #{player_hand[1]}. Total: #{player_total}."
-
-  # player turn
   loop do
-    player_turn = nil
-    loop do
-      prompt "Would you like to (h)it or (s)tay?"
-      player_turn = gets.chomp.downcase
-      break if ['h', 's'].include?(player_turn)
-      prompt "Sorry, must enter 'h' or 's'."
+    display_hand(HUMAN)
+    puts "......................................"
+    display_hand(DEALER)
+    puts "......................................"
+    display_score(HUMAN)
+    prompt "(h)it or (s)tay?"
+    puts
+    answer = gets.chomp
+
+    system "clear"
+      
+    if answer.downcase.start_with?("h")
+      puts
+      puts "You decided to Hit..."
+      puts
+      HUMAN[:hand] << deck.pop
+      HUMAN[:move] = "hit"
+    elsif answer.downcase.start_with?("s")
+      puts
+      puts "You decided to Stay..."
+      puts
+      HUMAN[:move] = "stay"
+    else
+      puts
+      puts "Invalid Entry."
+      puts
+      next
+    end
+  
+    tally_score(HUMAN)
+      
+    break if HUMAN[:move] == "stay" || player_bust?(HUMAN)
+  end
+
+  ##############################
+  # START INNER DEALER MOVE LOOP
+  ##############################
+  
+  loop do
+      
+    if DEALER[:score] < 17
+      puts
+      puts "Dealer hits..."
+      puts
+      DEALER[:hand] << deck.pop
+    elsif DEALER[:score] >= 17
+      puts
+      puts "Dealer stays..."
+      puts
+      DEALER[:move] = "stay"
     end
 
-    if player_turn == 'h'
-      player_hand << deck.pop
-      player_total = total(player_hand)
-      prompt "You chose to hit!"
-      prompt "Your hand is now: #{player_hand}"
-      prompt "Your total is now: #{player_total}"
-    end
+    tally_score(DEALER)
 
-    break if player_turn == 's' || busted?(player_total)
+    break if DEALER[:move] == "stay" || dealer_bust?(DEALER)
   end
 
-  if busted?(player_total)
-    display_result(dealer_total, player_total)
-    play_again? ? next : break
+  ###########################
+  # CHECK FOR WINNER OR LOSER
+  ###########################
+  
+  if player_bust?(HUMAN)
+    puts
+    puts "You busted! Dealer wins!"
+    puts
+    DEALER[:wins] += 1
+  elsif player_win?(HUMAN, DEALER)
+    puts
+    puts "You win!"
+    puts
+    HUMAN[:wins] += 1
+  elsif dealer_bust?(DEALER)
+    puts 
+    puts "Dealer busted. You Win!"
+    puts
+    HUMAN[:wins] += 1
+  elsif dealer_win?(DEALER, HUMAN)
+    puts
+    puts "Dealer wins!"
+    puts
+    DEALER[:wins] += 1
   else
-    prompt "You stayed at #{player_total}"
+    puts
+    puts "You have tied."
+    puts
   end
 
-  # dealer turn
-  prompt "Dealer turn..."
+  #####################
+  # DISPLAY FINAL SCORE
+  #####################
+  
+  puts
+  puts "Final score: "
+  puts "You: #{HUMAN[:score]} & Dealer: #{DEALER[:score]}."
+  puts
 
-  dealer_total = total(dealer_hand)
+  ###################
+  # DISPLAY GAME WINS
+  ###################
+  
+  puts "......................................"
+  puts
+  puts "Dealer wins: #{DEALER[:wins]}."
+  puts
+  puts "Your wins: #{HUMAN[:wins]}."
+  puts
+  puts "......................................"
 
-  loop do
-    break if dealer_total >= 17
-    prompt "Dealer hits!"
-    dealer_hand << deck.pop
-    prompt "Dealer's_hand are now: #{dealer_hand}"
+  ###################
+  # DISPLAY BEST OF 5
+  ###################
+  
+  if five_wins?(DEALER)
+    puts "Dealer wins best out of 5!"
+  elsif five_wins?(HUMAN)
+    puts "Human wins best out of 5!"
   end
 
-  if busted?(dealer_total)
-    prompt "Dealer total is now: #{dealer_total}"
-    display_result(dealer_total, player_total)
-    play_again? ? next : break
-  else
-    prompt "Dealer stays at #{dealer_total}"
-  end
-
-  # both player and dealer stays - compare_hand!
-  puts "=============="
-  prompt "Dealer has #{dealer_hand}, for a total of: #{dealer_total}"
-  prompt "Player has #{player_hand}, for a total of: #{player_total}"
-  puts "=============="
-
-  display_result(dealer_total, player_total)
-
+  #############
+  # FINISH GAME
+  #############
+  
   break unless play_again?
+  
+  # Break if HUMAN or DEALER gets 5 wins
+  break if five_wins?(HUMAN) || five_wins?(DEALER)
 end
 
-prompt "Thank you for playing Twenty-One! Good bye!"
+puts
+puts "Thanks for playing 21! Goodbye!"
