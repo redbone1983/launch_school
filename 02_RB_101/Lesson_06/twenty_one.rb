@@ -1,3 +1,10 @@
+require 'pry'
+# FIXES
+
+# play_again? after five_wins? returns true
+
+
+
 #######################
 # CREATE GAME CONSTANTS
 #######################
@@ -67,18 +74,11 @@ def tally_score(player)
   player[:score]
 end
 
-def player_bust?(player)
+def bust?(player)
   if player[:score] > 21
     player[:bust] = true 
   end
   player[:bust]
-end
-
-def dealer_bust?(dealer)
-  if dealer[:score] > 21
-    dealer[:bust] = true 
-  end
-  dealer[:bust]
 end
 
 def player_win?(player, dealer)
@@ -101,6 +101,14 @@ def five_wins?(player)
   player[:wins] == 5
 end
 
+def reset(player)
+  player[:hand] = []
+  player[:score] = 0
+  player[:move] = "stay"
+  player[:bust] = false
+  player
+end
+
 #######################
 # START GAME OUTER LOOP
 #######################
@@ -110,30 +118,29 @@ loop do
   
   deck = initialize_deck
   
-  # reset player's hand
-  HUMAN[:hand] = []
-  DEALER[:hand] = []
+  # reset
+  human = reset(HUMAN)
+  dealer = reset(DEALER)
 
   # Deal 2 card each
   2.times do
-    HUMAN[:hand] << deck.pop
-    DEALER[:hand] << deck.pop
+    human[:hand] << deck.pop
+    dealer[:hand] << deck.pop
   end
     
   # Tally score
-  tally_score(HUMAN)
-  tally_score(DEALER)
-
+  tally_score(human)
+  
   #############################
   # START INNER HUMAN MOVE LOOP
   #############################
   
   loop do
-    display_hand(HUMAN)
+    display_hand(human)
     puts "......................................"
-    display_hand(DEALER)
+    display_hand(dealer)
     puts "......................................"
-    display_score(HUMAN)
+    display_score(human)
     prompt "(h)it or (s)tay?"
     puts
     answer = gets.chomp
@@ -144,13 +151,13 @@ loop do
       puts
       puts "You decided to Hit..."
       puts
-      HUMAN[:hand] << deck.pop
-      HUMAN[:move] = "hit"
+      human[:hand] << deck.pop
+      human[:move] = "hit"
     elsif answer.downcase.start_with?("s")
       puts
       puts "You decided to Stay..."
       puts
-      HUMAN[:move] = "stay"
+      human[:move] = "stay"
     else
       puts
       puts "Invalid Entry."
@@ -158,71 +165,61 @@ loop do
       next
     end
   
-    tally_score(HUMAN)
+    tally_score(human)
       
-    break if HUMAN[:move] == "stay" || player_bust?(HUMAN)
+    break if human[:move] == "stay" || bust?(human)
   end
 
   ##############################
   # START INNER DEALER MOVE LOOP
   ##############################
+  tally_score(dealer)
   
   loop do
       
-    if DEALER[:score] < 17
+    if dealer[:score] < 17
       puts
       puts "Dealer hits..."
       puts
-      DEALER[:hand] << deck.pop
-    elsif DEALER[:score] >= 17
+      dealer[:hand] << deck.pop
+    elsif dealer[:score] >= 17
       puts
       puts "Dealer stays..."
       puts
-      DEALER[:move] = "stay"
+      dealer[:move] = "stay"
     end
 
-    tally_score(DEALER)
+   tally_score(dealer)
 
-    break if DEALER[:move] == "stay" || dealer_bust?(DEALER)
+    break if dealer[:move] == "stay" || bust?(dealer)
   end
 
   ###########################
   # CHECK FOR WINNER OR LOSER
   ###########################
   
-  if player_bust?(HUMAN)
-    puts
-    puts "You busted! Dealer wins!"
-    puts
-    DEALER[:wins] += 1
-  elsif player_win?(HUMAN, DEALER)
-    puts
-    puts "You win!"
-    puts
-    HUMAN[:wins] += 1
-  elsif dealer_bust?(DEALER)
-    puts 
-    puts "Dealer busted. You Win!"
-    puts
-    HUMAN[:wins] += 1
-  elsif dealer_win?(DEALER, HUMAN)
-    puts
-    puts "Dealer wins!"
-    puts
-    DEALER[:wins] += 1
+  if bust?(human) || dealer_win?(dealer, human)
+    puts "**************"
+    puts  "Dealer wins!"
+    puts "**************"
+    dealer[:wins] += 1
+  elsif bust?(dealer) || player_win?(human, dealer)
+    puts "************"
+    puts   "You Win!"
+    puts "************"
+    human[:wins] += 1
   else
-    puts
-    puts "You have tied."
-    puts
+    puts "****************"
+    puts  "You have tied."
+    puts "****************"
   end
 
   #####################
   # DISPLAY FINAL SCORE
   #####################
-  
   puts
   puts "Final score: "
-  puts "You: #{HUMAN[:score]} & Dealer: #{DEALER[:score]}."
+  puts "You: #{human[:score]} & Dealer: #{dealer[:score]}."
   puts
 
   ###################
@@ -231,9 +228,9 @@ loop do
   
   puts "......................................"
   puts
-  puts "Dealer wins: #{DEALER[:wins]}."
+  puts "Dealer wins: #{dealer[:wins]}."
   puts
-  puts "Your wins: #{HUMAN[:wins]}."
+  puts "Your wins: #{human[:wins]}."
   puts
   puts "......................................"
 
@@ -241,9 +238,9 @@ loop do
   # DISPLAY BEST OF 5
   ###################
   
-  if five_wins?(DEALER)
+  if five_wins?(dealer)
     puts "Dealer wins best out of 5!"
-  elsif five_wins?(HUMAN)
+  elsif five_wins?(human)
     puts "Human wins best out of 5!"
   end
 
@@ -254,7 +251,7 @@ loop do
   break unless play_again?
   
   # Break if HUMAN or DEALER gets 5 wins
-  break if five_wins?(HUMAN) || five_wins?(DEALER)
+  break if five_wins?(human) || five_wins?(dealer)
 end
 
 puts
