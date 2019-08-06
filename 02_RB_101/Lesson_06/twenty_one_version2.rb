@@ -196,7 +196,7 @@ loop do
     show(dealer, "hand")
     show(human, "score")
 
-    prompt "Enter any key to HIT or 1 to STAY"
+    prompt "Press Enter to HIT or 1 to STAY"
     answer = gets.to_i
 
     system "clear"
