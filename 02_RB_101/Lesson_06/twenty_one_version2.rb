@@ -1,19 +1,30 @@
 require 'pry'
-# FIXES
-
-# play_again? after five_wins? returns true
-
-
 
 #######################
 # CREATE GAME CONSTANTS
 #######################
 
-HUMAN = { name: "Your", hand: [], score: 0, wins: 0, move: "stay", bust: false }
-DEALER = { name: "Dealer's", hand: [], score: 0, wins: 0, move: "stay", bust: false }
+HUMAN = { 
+  name: "Your", 
+  hand: [], 
+  score: 0, 
+  wins: 0, 
+  move: "stay", 
+  bust: false }
+
+DEALER = { 
+  name: "Dealer's", 
+  hand: [], 
+  score: 0, 
+  wins: 0, 
+  move: "stay", 
+  bust: false }
+
 SUITS = ["♥", "♠", "♦", "♣"]
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
 WIN_NUM = 21
+NUM_BREAK = 17
+
 #######################
 # CREATE DECK OF CARDS
 #######################
@@ -153,7 +164,7 @@ def mutate(player, action, num)
 end
 
 #######################
-# START GAME OUTER LOOP
+# START OUTER GAME LOOP
 #######################
 
 loop do
@@ -189,7 +200,7 @@ loop do
     show(dealer, "hand")
     show(human, "score")
 
-    prompt "Enter 0 to HIT or 1 to STAY"
+    prompt "Enter any key to HIT or 1 to STAY"
     answer = gets.to_i
 
     system "clear"
@@ -221,12 +232,12 @@ loop do
   
   loop do
       
-    if dealer[:score] < 17
+    if dealer[:score] < NUM_BREAK
       prompt "Dealer hits..."
       
       detect(dealer, deck, :move)
       dealer_total = detect(dealer, deck, :score)
-    elsif dealer[:score] >= 17
+    elsif dealer[:score] >= NUM_BREAK
       prompt "Dealer stays..."
       mutate(dealer, :move, 1)
     end
@@ -287,4 +298,4 @@ loop do
   break unless play_again?
 end
 
-puts "Thanks for playing 21! Goodbye!"
+puts "Thanks for playing #{WIN_NUM}! Goodbye!"
