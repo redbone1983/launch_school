@@ -1,24 +1,24 @@
 require 'pry'
-
 #######################
 # CREATE GAME CONSTANTS
 #######################
+HUMAN = {
+  name: "Your",
+  hand: [],
+  score: 0,
+  wins: 0,
+  move: "stay",
+  bust: false
+}
 
-HUMAN = { 
-  name: "Your", 
-  hand: [], 
-  score: 0, 
-  wins: 0, 
-  move: "stay", 
-  bust: false }
-
-DEALER = { 
-  name: "Dealer's", 
-  hand: [], 
-  score: 0, 
-  wins: 0, 
-  move: "stay", 
-  bust: false }
+DEALER = {
+  name: "Dealer's",
+  hand: [],
+  score: 0,
+  wins: 0,
+  move: "stay",
+  bust: false
+}
 
 SUITS = ["♥", "♠", "♦", "♣"]
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
@@ -38,7 +38,7 @@ end
 ########################
 
 def prompt(str)
-  puts 
+  puts
   puts "=> #{str}"
   puts
 end
@@ -52,7 +52,7 @@ def display_hand(player)
   elsif player == DEALER
     hand << "#{player[:hand].first} ['unknown']"
   end
-  prompt "#{hand}"
+  prompt hand.to_s
 end
 
 def display_score(player)
@@ -70,18 +70,16 @@ end
 def tally_score(player)
   # Reset players score
   player[:score] = 0
-  
+
   player[:hand].each do |card|
     value = card.first
-    
     if value.class == Integer
-      player[:score] += value 
+      player[:score] += value
     elsif value.class == String
       player[:score] += 10
     elsif value.class == Symbol
       player[:score] += 11
     end
-
   end
 
   player[:score]
@@ -89,7 +87,7 @@ end
 
 def bust?(player)
   if player[:score] > WIN_NUM
-    player[:bust] = true 
+    player[:bust] = true
   end
   player[:bust]
 end
@@ -128,10 +126,9 @@ def deal_cards(player, cards, num = 1)
 end
 
 def detect(player, cards, action, num = 1)
-
   case action
   when :score
-    tally_score(player) 
+    tally_score(player)
   when :move
     deal_cards(player, cards, num)
   when :bust
@@ -142,7 +139,6 @@ def detect(player, cards, action, num = 1)
 end
 
 def show(player, item)
-  
   case item
   when "score"
     display_score(player)
@@ -154,12 +150,13 @@ def show(player, item)
 end
 
 def mutate(player, action, num)
-  player[action] = case action
-  when :move
-    ["hit", "stay"][num]
-  when :bust
-    bust?(player)
-  end
+  player[action] =
+    case action
+    when :move
+      ["hit", "stay"][num]
+    when :bust
+      bust?(player)
+    end
   player
 end
 
@@ -169,7 +166,7 @@ end
 
 loop do
   system "clear"
-  
+
   deck = initialize_deck
 
   # reset
@@ -183,18 +180,17 @@ loop do
   end
 
   # Deal 2 card each
-  human_hand = detect(human, deck, :move, 2)
-  dealer_hand = detect(dealer, deck, :move, 2)
+  detect(human, deck, :move, 2)
+  detect(dealer, deck, :move, 2)
 
   # Tally score
   human_total = detect(human, deck, :score)
   dealer_total = detect(dealer, deck, :score)
 
-  
   #############################
   # START INNER HUMAN MOVE LOOP
   #############################
-  
+
   loop do
     show(human, "hand")
     show(dealer, "hand")
@@ -204,7 +200,7 @@ loop do
     answer = gets.to_i
 
     system "clear"
-      
+
     if answer == 0
       prompt "You decided to hit..."
       puts "************"
@@ -220,21 +216,18 @@ loop do
       puts "************"
       next
     end
-  
-    human_total
-      
+
     break if human[:move] == "stay" || bust?(human)
   end
 
   ##############################
   # START INNER DEALER MOVE LOOP
   ##############################
-  
+
   loop do
-      
     if dealer[:score] < NUM_BREAK
       prompt "Dealer hits..."
-      
+
       detect(dealer, deck, :move)
       dealer_total = detect(dealer, deck, :score)
     elsif dealer[:score] >= NUM_BREAK
@@ -242,15 +235,13 @@ loop do
       mutate(dealer, :move, 1)
     end
 
-    dealer_total
-
     break if dealer[:move] == "stay" || bust?(dealer)
   end
 
   ###########################
   # CHECK FOR WINNER OR LOSER
   ###########################
-  
+
   if bust?(human) || win?(dealer, human)
     puts "**************"
     prompt "Dealer wins!"
@@ -278,13 +269,13 @@ loop do
   ###################
   # DISPLAY GAME WINS
   ###################
-  
+
   display_wins(human, dealer)
- 
+
   ###################
   # DISPLAY BEST OF 5
   ###################
-  
+
   if show(dealer, "five")
     prompt "Dealer wins best out of 5!"
   elsif show(human, "five")
@@ -294,7 +285,7 @@ loop do
   #############
   # FINISH GAME
   #############
-  
+
   break unless play_again?
 end
 
