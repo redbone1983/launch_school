@@ -2,6 +2,14 @@ require 'pry'
 #######################
 # CREATE GAME CONSTANTS
 #######################
+SUITS = ["♥", "♠", "♦", "♣"]
+VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
+WIN_NUM = 21
+NUM_BREAK = 17
+
+#######################
+# CREATE PLAYER OBJECTS
+#######################
 HUMAN = {
   name: "Your",
   hand: [],
@@ -19,11 +27,6 @@ DEALER = {
   move: "stay",
   bust: false
 }
-
-SUITS = ["♥", "♠", "♦", "♣"]
-VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
-WIN_NUM = 21
-NUM_BREAK = 17
 
 #######################
 # CREATE DECK OF CARDS
@@ -209,7 +212,6 @@ loop do
       detect(human, deck, :move)
       mutate(human, :move, answer)
       human_total = detect(human, deck, :score)
-      binding.pry
     elsif answer == 1
       prompt "You decided to stay..."
       puts "************"
@@ -220,7 +222,7 @@ loop do
       next
     end
 
-    break if human[:move] == "stay" || bust?(human)
+    break if human[:move] == "stay" || bust?(human) 
   end
 
   ##############################
@@ -228,16 +230,17 @@ loop do
   ##############################
 
   loop do
-    if dealer[:score] < NUM_BREAK
+    
+    if dealer_total < NUM_BREAK
       prompt "Dealer hits..."
 
       detect(dealer, deck, :move)
       dealer_total = detect(dealer, deck, :score)
-    elsif dealer[:score] >= NUM_BREAK
+    elsif dealer_total >= NUM_BREAK
       prompt "Dealer stays..."
       mutate(dealer, :move, 1)
     end
-
+    binding.pry
     break if dealer[:move] == "stay" || bust?(dealer)
   end
 
@@ -245,20 +248,20 @@ loop do
   # CHECK FOR WINNER OR LOSER
   ###########################
 
-  if bust?(human) || win?(dealer, human)
-    puts "**************"
-    prompt "Dealer wins!"
-    puts "**************"
-    dealer[:wins] += 1
+  if bust?(human) && bust?(dealer)
+    puts "************"
+    prompt "You both busted!"
+    puts "************"
   elsif bust?(dealer) || win?(human, dealer)
     puts "************"
     prompt "You Win!"
     puts "************"
     human[:wins] += 1
-  elsif bust?(human) && bust?(dealer)
-    puts "************"
-    prompt "You both busted!"
-    puts "************"
+  elsif bust?(human) || win?(dealer, human)
+    puts "**************"
+    prompt "Dealer wins!"
+    puts "**************"
+    dealer[:wins] += 1
   else
     puts "****************"
     prompt "You have tied."
@@ -270,7 +273,7 @@ loop do
   #####################
 
   prompt "Final score: "
-  prompt "You: #{human[:score]} & Dealer: #{dealer[:score]}."
+  prompt "You: #{human_total} & Dealer: #{dealer_total}."
   puts "************"
 
   ###################
