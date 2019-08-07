@@ -79,9 +79,11 @@ def tally_score(player)
       player[:score] += 10
     elsif value.class == Symbol
       player[:score] += 11
+      player[:score] -= 10 if player[:score] > WIN_NUM
     end
-  end
 
+  end
+  
   player[:score]
 end
 
@@ -207,6 +209,7 @@ loop do
       detect(human, deck, :move)
       mutate(human, :move, answer)
       human_total = detect(human, deck, :score)
+      binding.pry
     elsif answer == 1
       prompt "You decided to stay..."
       puts "************"
@@ -252,6 +255,10 @@ loop do
     prompt "You Win!"
     puts "************"
     human[:wins] += 1
+  elsif bust?(human) && bust?(dealer)
+    puts "************"
+    prompt "You both busted!"
+    puts "************"
   else
     puts "****************"
     prompt "You have tied."
