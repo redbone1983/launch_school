@@ -1,14 +1,8 @@
-#######################
-# CREATE GAME CONSTANTS
-#######################
 SUITS = ["♥", "♠", "♦", "♣"]
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', :A]
 WIN_NUM = 21
 NUM_BREAK = 17
 
-#######################
-# CREATE PLAYER OBJECTS
-#######################
 HUMAN = {
   name: nil,
   hand: [],
@@ -39,17 +33,17 @@ end
 
 def detect_hand(player)
   hand = "#{player[:name]}'s hand is "
-  
+
   if player == HUMAN
     player[:hand].each do |card|
       hand << "#{card} "
     end
   end
-  
+
   if player == DEALER
     hand << "#{player[:hand].first} ['unknown']"
   end
-  
+
   hand.to_s
 end
 
@@ -62,7 +56,8 @@ def display_score(player)
 end
 
 def display_game_wins(player, dealer)
-  prompt "#{player[:name]}'s wins: #{player[:wins]}. #{dealer[:name]}'s wins: #{dealer[:wins]}."
+  prompt "#{player[:name]}'s wins: #{player[:wins]}."
+  prompt "#{dealer[:name]}'s wins: #{dealer[:wins]}."
 end
 
 def score_total(player)
@@ -78,9 +73,8 @@ def score_total(player)
       player[:score] += 11
       player[:score] -= 10 if player[:score] > WIN_NUM
     end
-
   end
-  
+
   player[:score]
 end
 
@@ -125,6 +119,7 @@ def deal_cards(player, cards, num = 1)
   num.times do
     player[:hand] << cards.pop
   end
+  player[:hand]
 end
 
 def player_move(player, move)
@@ -141,165 +136,146 @@ def get_name(player, dealer)
   name = gets.chomp
   player[:name] = name
 
+  system "clear"
+
   prompt "Hi, #{name}. Now, enter your dealer's name: "
   dealer_name = gets.chomp
   dealer[:name] = dealer_name
 
+  system "clear"
+
   prompt "Welcome to #{WIN_NUM}, #{name}!"
 end
 
-def human_moves(player, dealer, cards)
-    display_hand(player)
-    display_hand(dealer)
-    display_score(player)
-    
-    prompt "Enter (s)tay or (h)it"
-    answer = gets.chomp
-
-    system "clear"
-
-    if answer.downcase == "h"
-      prompt "#{player[:name]} decided to hit..."
-      puts "************"
-      player_move(player, answer)
-      deal_cards(player, cards, 1)
-      score_total(player)
-    elsif answer.downcase == "s"
-      prompt "#{player[:name]} decided to stay..."
-      puts "************"
-      player_move(player, answer)
-    else
-      prompt "Invalid Entry."
-      puts "************"
-    end
-
-end
-
-def detect_and_display_winner(player, dealer)
-  if bust?(player)
-    puts "************"
-    prompt "#{player[:name]} busted! #{dealer[:name]} wins!"
-    puts "************"
-    dealer[:wins] += 1
-  elsif bust?(dealer)
-    puts "************"
-    prompt "#{dealer[:name]} busted! #{player[:name]} wins!"
-    puts "************"
-    player[:wins] += 1
-  elsif player_win?(player, dealer)
-    puts "**************"
-    prompt "#{player[:name]} wins!"
-    puts "**************"
-    player[:wins] += 1
-  elsif dealer_win?(dealer, player)
-    puts "****************"
-    prompt "#{dealer[:name]} wins!"
-    puts "****************"
-    dealer[:wins] += 1
+def hit_or_stay?(player, answer, cards)
+  if answer.downcase == "h"
+    prompt "#{player[:name]} decided to hit..."
+    player_move(player, answer)
+    deal_cards(player, cards, 1)
+    score_total(player)
+  elsif answer.downcase == "s"
+    prompt "#{player[:name]} decided to stay..."
+    player_move(player, answer)
   else
-    puts "****************"
-    prompt "You have tied."
-    puts "****************"
+    prompt "Invalid entry."
+    human_moves(player, DEALER, cards)
   end
 end
 
-#######################
-# START OUTER GAME LOOP
-#######################
+def human_moves(player, dealer, cards)
+  display_hand(player)
+  display_hand(dealer)
+  display_score(player)
 
+  prompt "Enter (s)tay or (h)it"
+  answer = gets.chomp
+
+  system "clear"
+
+  hit_or_stay?(player, answer, cards)
+end
+
+def detect_winner(player, dealer)
+  if bust?(player)
+    :player_busted
+  elsif bust?(dealer)
+    :dealer_busted
+  elsif player_win?(player, dealer)
+    :player_wins
+  elsif dealer_win?(dealer, player)
+    :dealer_wins
+  else
+    :tie
+  end
+end
+
+def display_winner(player, dealer)
+  case detect_winner(player, dealer)
+  when :player_busted
+    prompt "#{player[:name]} busted! #{dealer[:name]} wins!"
+  when :dealer_busted
+    prompt "#{dealer[:name]} busted! #{player[:name]} wins!"
+  when :player_wins
+    prompt "#{player[:name]} wins!"
+  when :dealer_wins
+    prompt "#{dealer[:name]} wins!"
+  when :tie
+    prompt "You have tied."
+  end
+end
+
+def total_wins(player, dealer)
+  case detect_winner(player, dealer)
+  when :player_busted
+    dealer[:wins] += 1
+  when :dealer_wins
+    dealer[:wins] += 1
+  when :dealer_busted
+    player[:wins] += 1
+  when :player_wins
+    player[:wins] += 1
+  end
+end
+
+get_name(HUMAN, DEALER)
+
+# START OUTER GAME LOOP
 loop do
   system "clear"
 
   deck = initialize_deck
 
-  # reset
   human = reset(HUMAN)
   dealer = reset(DEALER)
 
-  # Welcome Player
-  get_name(human, dealer)
-
-  # reset wins?
   if five_wins?(human) || five_wins?(dealer)
     human = reset_wins(human)
     dealer = reset_wins(dealer)
   end
 
-  # Deal 2 card each
   deal_cards(human, deck, 2)
   deal_cards(dealer, deck, 2)
 
-  # Tally score
   human_total = score_total(human)
   dealer_total = score_total(dealer)
 
-  #############################
   # HUMAN MOVES
-  #############################
-  
   loop do
-   human_moves(human, dealer, deck)
-   human_total = score_total(human)
-   break if human[:move] == "stay" || bust?(human) 
+    human_moves(human, dealer, deck)
+    human_total = score_total(human)
+    break if human[:move] == "stay" || bust?(human)
   end
-    
-  ##############################
-  # DEALER MOVES
-  ##############################
 
+  # DEALER MOVES
   loop do
     if dealer_total < NUM_BREAK
       prompt "#{dealer[:name]} hits..."
       player_move(dealer, 'h')
+      deal_cards(dealer, deck, 1)
       detect_hand(dealer)
       dealer_total = score_total(dealer)
     elsif dealer_total >= NUM_BREAK
       prompt "#{dealer[:name]} stays..."
       player_move(dealer, 's')
-    else
-      prompt "#{dealer[:name]} Loop is invalid."
-      next
     end
 
-    break if player_move(dealer, 's') == "stay" || bust?(dealer)
+    break if dealer[:move] == "stay" || bust?(dealer)
   end
 
-  human_total = score_total(human)
-  dealer_total = score_total(dealer)
-
-  ###########################
-  # DISPLAY WINNER
-  ###########################
-
-  detect_and_display_winner(human, dealer)
-
-  #####################
-  # DISPLAY FINAL SCORE
-  #####################
+  detect_winner(human, dealer)
+  display_winner(human, dealer)
+  total_wins(human, dealer)
 
   prompt "Final score: "
   prompt "You: #{human_total} & Dealer: #{dealer_total}."
-  puts "************"
-
-  ###################
-  # DISPLAY GAME WINS
-  ###################
 
   display_game_wins(human, dealer)
-
-  ###################
-  # DISPLAY BEST OF 5
-  ###################
 
   if five_wins?(dealer)
     prompt "Dealer wins best out of 5!"
   elsif five_wins?(human)
     prompt "Human wins best out of 5!"
   end
-
-  #############
-  # FINISH GAME
-  #############
 
   break unless play_again?
 end
